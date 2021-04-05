@@ -1,0 +1,14 @@
+.combine-shares {
+  height: calc(100vh - var(--navbar-size));
+  overflow-y: auto;
+}
+
+.sharesTable {
+  border-collapse: collapse;
+  table-layout: fixed;
+  width: 100%;
+}
+
+.sharesTable td {
+  word-wrap: break-word;
+}
