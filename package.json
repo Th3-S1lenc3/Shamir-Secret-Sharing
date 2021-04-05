@@ -1,8 +1,33 @@
 {
   "name": "shamir-secret-sharing",
   "description": "App for creating and combining secrets with Shamir Secret Sharing",
+  "author": {
+    "name": "Th3_S1lenc3",
+    "email": "54558771+Th3-S1lenc3@users.noreply.github.com"
+  },
   "version": "1.0.0",
   "private": true,
+  "license": "MIT",
+  "build": {
+    "appId": "com.Th3_S1lenc3.math-calculator",
+    "files": [
+      "build/**/*",
+      "node_modules/**/*"
+    ],
+    "linux": {
+      "target": [
+        "AppImage",
+        "snap",
+        "deb"
+      ]
+    },
+    "win": {
+      "target": [
+        "nsis",
+        "portable"
+      ]
+    }
+  },
   "dependencies": {
     "@consento/shamirs-secret-sharing": "^1.0.4",
     "@fortawesome/fontawesome-svg-core": "^1.2.35",
