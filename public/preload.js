@@ -6,13 +6,13 @@ contextBridge.exposeInMainWorld(
     "api", {
         request: (channel, data) => {
             // whitelist channels
-            let validChannels = ["toMain", "save:file", "upload:files", "upload:files:one", "upload:files:reply"];
+            let validChannels = ["toMain", "save:file", "save:files", "upload:files", "upload:files:one", "upload:files:reply"];
             if (validChannels.includes(channel)) {
                 ipcRenderer.send(channel, data);
             }
         },
         receive: (channel, func) => {
-            let validChannels = ["fromMain", "save:file", "upload:files", "upload:files:one", "upload:files:reply"];
+            let validChannels = ["fromMain", "save:file", "save:files", "upload:files", "upload:files:one", "upload:files:reply"];
             if (validChannels.includes(channel)) {
                 // Deliberately strip event as it includes `sender`
                 ipcRenderer.on(channel, (event, ...args) => func(...args));

@@ -8,7 +8,7 @@ const fs = require('fs');
 
 let mainWindow;
 
-const homepage = 'https://github.com/Th3-S1lenc3/';
+const homepage = 'https://github.com/Th3-S1lenc3/Shamir-Secret-Sharing';
 
 const menuTemplate = [
   // { role: 'appMenu' }
@@ -153,6 +153,10 @@ ipcMain.on('save:file', (event, data) => {
   saveFile(data);
 });
 
+ipcMain.on('save:files', (event, data) => {
+  saveFiles(data);
+});
+
 ipcMain.on('upload:files', (event, data) => {
   openFile(false, data);
 });
@@ -162,10 +166,39 @@ ipcMain.on('upload:files:one', (event, data) => {
 });
 
 
-function saveFile(data) {
+async function saveFiles(data) {
+  console.log('Save Files.');
+  const dir = await dialog.showOpenDialog(mainWindow, {
+    title: 'Save files to:',
+    buttonLabel: 'Save Here',
+    defaultPath: app.getPath('documents'),
+    properties: ['openDirectory'],
+  });
+
+  data.forEach((share, part) => {
+    try {
+      const { filePaths: filePathRoot } = dir;
+      const fileName = `share_${part}.txt`;
+      const filePath = path.join(filePathRoot[0], fileName);
+      const fileContent = share;
+
+      fs.writeFile(filePath, fileContent, (err) => {
+        if (err) {
+          throw err;
+        }
+      })
+    }
+    catch (err) {
+      console.log(err);
+      let error = dialog.showErrorBox('An Error Occurred.', err);
+    }
+  });
+}
+
+async function saveFile(data) {
   console.log('Save File.');
   const { fileName, fileContent } = data;
-  const file = dialog.showSaveDialog(mainWindow, {
+  const file = await dialog.showSaveDialog(mainWindow, {
     title: 'Save As',
     buttonLabel: 'Save',
     defaultPath: path.join(app.getPath('documents'), fileName),
@@ -175,18 +208,20 @@ function saveFile(data) {
         extentions: ['txt'],
       },
     ],
-  }).then((result) => {
-    const { canceled, filePath } = result
-    if (!canceled) {
+  })
+  const { canceled, filePath } = file;
+  if (!canceled) {
+    try {
       fs.writeFile(filePath, fileContent, (err) => {
         if (err) {
-          const error = dialog.showErrorBox('An Error Occurred.', err);
+          throw err;
         }
       });
     }
-  }).catch(err => {
-    const error = dialog.showErrorBox('An Error Occurred.', err);
-  });
+    catch (err) {
+      let error = dialog.showErrorBox('An Error Occurred.', err);
+    }
+  }
 }
 
 function openFile(oneFile, caller) {

@@ -5,6 +5,7 @@ import { AppContext } from '../AppContext';
 const shamir = require('@consento/shamirs-secret-sharing');
 
 import Table from '../Utilities/Table';
+import DownloadBtn from '../Utilities/DownloadBtn';
 
 export default class GenerateParts extends Component {
 
@@ -45,7 +46,10 @@ export default class GenerateParts extends Component {
     let outputTmp;
 
     outputTmp = (
-      <h4 key={key + 0} className='pt-2'>Parts</h4>
+      <h4 key={key + 0} className='pt-2'>
+        Parts
+        <DownloadBtn className='float-right mb-1' />
+      </h4>
     );
     output.push(outputTmp);
 
