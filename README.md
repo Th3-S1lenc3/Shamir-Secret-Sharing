@@ -77,6 +77,6 @@ $ npm run electron-dev
 ```
 
 # License
-[Back to top](#math-calculator)
+[Back to top](#shamir-secret-sharing)
 
 This project is licensed under the MIT License - see [LICENSE](LICENSE) for details
