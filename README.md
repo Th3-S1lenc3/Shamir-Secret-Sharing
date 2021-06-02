@@ -5,7 +5,7 @@ Created with Node.js, Electron & React.
 
 If you experience a problem, search through the [Issues](https://github.com/Th3-S1lenc3/Shamir-Secret-Sharing/issues) to see if yours has already been reported. If you're confident it hasn't been reported yet, feel free to open up a new one. If you see your issue and it's been closed, it probably means that the fix for it will ship in the next version, and you'll have to wait a bit.
 
-*( Jump to: [Technologies](#technologies) - [Installation & Usage](#installation&usage) - [License](#license) )*
+*( Jump to: [Technologies](#technologies) - [Installation & Usage](#installation--usage) - [License](#license) )*
 
 # Technologies
 [Back to top](#shamir-secret-sharing)
