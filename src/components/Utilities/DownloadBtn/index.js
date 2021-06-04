@@ -50,7 +50,7 @@ export default class DownloadBtn extends Component {
     }
 
     if (Object.keys(content).length > 0) {
-      api.request('save:file', content);
+      api.request('save:files:one', content);
     }
   }
 

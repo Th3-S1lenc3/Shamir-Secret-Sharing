@@ -5,18 +5,31 @@ const { contextBridge, ipcRenderer } = require("electron");
 contextBridge.exposeInMainWorld(
     "api", {
         request: (channel, data) => {
-            // whitelist channels
-            let validChannels = ["toMain", "save:file", "save:files", "upload:files", "upload:files:one", "upload:files:reply"];
-            if (validChannels.includes(channel)) {
-                ipcRenderer.send(channel, data);
-            }
+          // whitelist channels
+          const validChannels = [
+            "toMain",
+            "save:files",
+            "save:files:one",
+            "save:qrCodes",
+            "save:qrCodes:one",
+            "upload:files",
+            "upload:files:one",
+            "upload:qrCodes",
+            "upload:qrCodes:one",
+          ];
+          if (validChannels.includes(channel)) {
+              ipcRenderer.send(channel, data);
+          }
         },
         receive: (channel, func) => {
-            let validChannels = ["fromMain", "save:file", "save:files", "upload:files", "upload:files:one", "upload:files:reply"];
-            if (validChannels.includes(channel)) {
-                // Deliberately strip event as it includes `sender`
-                ipcRenderer.on(channel, (event, ...args) => func(...args));
-            }
+          const validChannels = [
+            "fromMain",
+            "upload:reply",
+          ];
+          if (validChannels.includes(channel)) {
+              // Deliberately strip event as it includes `sender`
+              ipcRenderer.on(channel, (event, ...args) => func(...args));
+          }
         }
     }
 );

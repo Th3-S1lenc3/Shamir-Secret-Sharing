@@ -11,7 +11,7 @@ const Space = () => <>&nbsp;</>;
 export default class SplitSecret extends Component {
   static contextType = AppContext;
 
-  state={
+  state = {
     force_update: true,
   }
 
@@ -50,26 +50,28 @@ export default class SplitSecret extends Component {
     output.push(outputTmp);
 
     outputTmp = (
-      <p key={key + 1}>
-        Require<Space />
-        <span
-          className='required'
-          contentEditable='true'
-          onKeyDown={this.validateNumerical}
-          onInput={(e) => {this.handleInput(e)}}
-          placeholder='3'
-        /><Space />
-        parts from<Space />
-        <span
-          className='total'
-          contentEditable='true'
-          onKeyDown={this.validateNumerical}
-          onInput={(e) => {this.handleInput(e)}}
-          placeholder='5'
-        /><Space />
-        to reconstruct the following secret:
+      <div key={key + 1} className='uploadBtn-container'>
+        <p>
+          Require<Space />
+          <span
+            className='required'
+            contentEditable='true'
+            onKeyDown={this.validateNumerical}
+            onInput={(e) => {this.handleInput(e)}}
+            placeholder='3'
+          /><Space />
+          parts from<Space />
+          <span
+            className='total'
+            contentEditable='true'
+            onKeyDown={this.validateNumerical}
+            onInput={(e) => {this.handleInput(e)}}
+            placeholder='5'
+          /><Space />
+          to reconstruct the following secret:
+        </p>
         <UploadBtn className='float-right' caller='secret'/>
-      </p>
+      </div>
     );
     output.push(outputTmp);
 

@@ -12,3 +12,9 @@
 .sharesTable td {
   word-wrap: break-word;
 }
+
+.uploadBtn-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+}

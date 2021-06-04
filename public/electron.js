@@ -1,4 +1,12 @@
 const { app, dialog, BrowserWindow, ipcMain, Menu } = require('electron');
+const { createWorker } = require('tesseract.js');
+const worker = createWorker({
+  logger: m => console.log(m),
+});
+const QRCode = require('qrcode');
+const QRReader = require('qrcode-reader');
+const jimp = require('jimp');
+
 
 const path = require('path');
 const url = require('url');
@@ -126,7 +134,6 @@ function createWindow() {
     minHeight: height,
     webPreferences: {
       nodeIntegration: true,
-      enableRemoteModule: true,
       preload: path.join(__dirname, 'preload.js'),
     }
   });
@@ -149,13 +156,21 @@ app.on('activate', () => {
   }
 });
 
-ipcMain.on('save:file', (event, data) => {
-  saveFile(data);
-});
-
 ipcMain.on('save:files', (event, data) => {
   saveFiles(data);
 });
+
+ipcMain.on('save:files:one', (event, data) => {
+  saveFile(data);
+});
+
+ipcMain.on('save:qrCode', (event, data) => {
+  saveQRCode(data);
+})
+
+ipcMain.on('save:qrCodes', (event, data) => {
+  saveQRCodes(data);
+})
 
 ipcMain.on('upload:files', (event, data) => {
   openFile(false, data);
@@ -165,35 +180,13 @@ ipcMain.on('upload:files:one', (event, data) => {
   openFile(true, data);
 });
 
+ipcMain.on('upload:qrCodes', (event, data) => {
+  openQRCode(false, data);
+});
 
-async function saveFiles(data) {
-  console.log('Save Files.');
-  const dir = await dialog.showOpenDialog(mainWindow, {
-    title: 'Save files to:',
-    buttonLabel: 'Save Here',
-    defaultPath: app.getPath('documents'),
-    properties: ['openDirectory'],
-  });
-
-  data.forEach((share, part) => {
-    try {
-      const { filePaths: filePathRoot } = dir;
-      const fileName = `share_${part}.txt`;
-      const filePath = path.join(filePathRoot[0], fileName);
-      const fileContent = share;
-
-      fs.writeFile(filePath, fileContent, (err) => {
-        if (err) {
-          throw err;
-        }
-      })
-    }
-    catch (err) {
-      console.log(err);
-      let error = dialog.showErrorBox('An Error Occurred.', err);
-    }
-  });
-}
+ipcMain.on('upload:qrCodes:one', (event, data) => {
+  openQRCode(true, data);
+});
 
 async function saveFile(data) {
   console.log('Save File.');
@@ -224,16 +217,100 @@ async function saveFile(data) {
   }
 }
 
-function openFile(oneFile, caller) {
+async function saveFiles(data) {
+  console.log('Save Files.');
+  const dir = await dialog.showOpenDialog(mainWindow, {
+    title: 'Save files to:',
+    buttonLabel: 'Save Here',
+    defaultPath: app.getPath('documents'),
+    properties: ['openDirectory'],
+  });
+
+  data.forEach((share, part) => {
+    try {
+      const { filePaths: filePathRoot } = dir;
+      const fileName = `share_${part}.txt`;
+      const filePath = path.join(filePathRoot[0], fileName);
+      const fileContent = share;
+
+      fs.writeFile(filePath, fileContent, (err) => {
+        if (err) {
+          throw err;
+        }
+      })
+    }
+    catch (err) {
+      console.log(err);
+      let error = dialog.showErrorBox('An Error Occurred.', err);
+    }
+  });
+}
+
+async function saveQRCode(data) {
+  console.log('Save QR Code.');
+  const { fileName, fileContent } = data;
+  const file = await dialog.showSaveDialog(mainWindow, {
+    title: 'Save As',
+    buttonLabel: 'Save',
+    defaultPath: path.join(app.getPath('pictures'), fileName),
+    filters: [
+      {
+        name: 'Images',
+        extentions: ['png'],
+      },
+    ],
+  })
+  const { canceled, filePath } = file;
+  if (!canceled) {
+    try {
+      fs.writeFile(filePath, fileContent, (err) => {
+        if (err) {
+          throw err;
+        }
+      });
+    }
+    catch (err) {
+      console.log(err);
+      let error = dialog.showErrorBox('An Error Occurred.', err);
+    }
+  }
+}
+
+async function saveQRCodes(data) {
+  console.log('Save QR Codes.');
+  const dir = await dialog.showOpenDialog(mainWindow, {
+    title: 'Save files to:',
+    buttonLabel: 'Save Here',
+    defaultPath: app.getPath('pictures'),
+    properties: ['openDirectory'],
+  });
+
+  data.forEach((share, part) => {
+    try {
+      const { filePaths: filePathRoot } = dir;
+      const fileName = `share_${part}.txt`;
+      const filePath = path.join(filePathRoot[0], fileName);
+      const fileContent = share;
+
+      QRCode.toFile(filePath, fileContent, null, (err) => {
+        if (err) throw err
+      });
+    }
+    catch (err) {
+      console.log(err);
+      let error = dialog.showErrorBox('An Error Occurred.', err);
+    }
+  });
+}
+
+async function openFile(oneFile, caller) {
   console.log('Open File.');
-  const files = dialog.showOpenDialog(mainWindow, {
+  const files = await dialog.showOpenDialog(mainWindow, {
     title: 'Open File',
     defaultPath: app.getPath('documents'),
     properties: [
       'openFile',
-      ...(oneFile ? [] : [
-        'multiSelections',
-      ]),
+      ...(oneFile ? '' : 'multiSelections'),
     ],
     filters: [
       {
@@ -241,24 +318,75 @@ function openFile(oneFile, caller) {
         extentions: ['txt'],
       }
     ],
-  }).then((result) => {
-    const { canceled, filePaths } = result;
-
-    if (!canceled) {
-      const files = [];
-      for (let file in filePaths) {
-        let fileName = filePaths[file].split('/').pop();
-        let fileContent = fs.readFileSync(filePaths[file]).toString();
-        let fileJSON = {
-          fileName: fileName,
-          fileContent: fileContent,
-        };
-        files.push(fileJSON);
-      }
-      mainWindow.webContents.send('upload:files:reply', {
-        caller: caller,
-        files: files
-      });
-    }
   });
+
+  const { canceled, filePaths } = files;
+
+  if (!canceled) {
+    const files = [];
+    for (let file in filePaths) {
+      let fileName = filePaths[file].split('/').pop();
+      let fileContent = fs.readFileSync(filePaths[file]).toString();
+      let fileJSON = {
+        fileName: fileName,
+        fileContent: fileContent,
+      };
+      files.push(fileJSON);
+    }
+    mainWindow.webContents.send('upload:reply', {
+      caller: caller,
+      files: files
+    });
+  }
+}
+
+async function openQRCode(oneFile, caller) {
+  console.log('Open QR Code.');
+  const files = await dialog.showOpenDialog(mainWindow, {
+    title: 'Open Image',
+    defaultPath: app.getPath('pictures'),
+    properties: [
+      'openFile',
+      ...(oneFile ? '' : 'multiSelections'),
+    ],
+    filters: [
+      {
+        name: 'Images',
+        extentions: ['png'],
+      }
+    ],
+  });
+
+  const { canceled, filePaths } = files;
+
+  if (!canceled) {
+    const files = [];
+    for (let file in filePaths) {
+      let fileName = filePaths[file].split('/').pop();
+      let fileContent = readQRCode(filePaths[file]).toString();
+      let fileJSON = {
+        fileName: fileName,
+        fileContent: fileContent,
+      };
+      files.push(fileJSON);
+    }
+    mainWindow.webContents.send('upload:reply', {
+      caller: caller,
+      files: files
+    });
+  }
+}
+
+async function readQRCode() {
+  const img = await jimp.read(fs.readFileSync('./qrcode.png'));
+
+  const qr = new QRReader();
+
+  // qrcode-reader's API doesn't support promises, so wrap it
+  const { result } = await new Promise((resolve, reject) => {
+    qr.callback = (err, v) => err != null ? reject(err) : resolve(v);
+    qr.decode(img.bitmap);
+  });
+
+  return result;
 }

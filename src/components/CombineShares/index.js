@@ -33,16 +33,16 @@ export default class CombineShares extends Component {
     output.push(outputTmp);
 
     outputTmp = (
-      <p key={key + 1}>
-        Enter the shares, one per line:
-        <UploadBtn className='float-right' caller='parts'/>
-      </p>
+      <div key={key + 1} className='uploadBtn-container'>
+        <p>Enter the shares, one per line:</p>
+        <UploadBtn className='float-right' caller='shares'/>
+      </div>
     );
     output.push(outputTmp);
 
     outputTmp = (
       <div key={key + 2}>
-        <textarea className='parts form-control' rows='10' data-caller='parts' onChange={(e) => {this.handleInput(e)}} />
+        <textarea className='parts form-control' rows='10' data-caller='shares' onChange={(e) => {this.handleInput(e)}} />
       </div>
     );
     output.push(outputTmp);
