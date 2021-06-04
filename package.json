@@ -5,7 +5,7 @@
     "name": "Th3_S1lenc3",
     "email": "54558771+Th3-S1lenc3@users.noreply.github.com"
   },
-  "version": "1.0.0",
+  "version": "2.0.0-dev",
   "private": true,
   "license": "MIT",
   "build": {
@@ -29,21 +29,10 @@
     }
   },
   "dependencies": {
-    "@consento/shamirs-secret-sharing": "^1.0.4",
-    "@fortawesome/fontawesome-svg-core": "^1.2.35",
-    "@fortawesome/free-solid-svg-icons": "^5.15.3",
-    "@fortawesome/react-fontawesome": "^0.1.14",
-    "bootstrap": "^4.6.0",
     "electron-is-dev": "^2.0.0",
-    "jimp": "^0.16.1",
-    "jquery": "^3.5.1",
-    "qrcode": "^1.4.4",
-    "qrcode-reader": "^1.0.4",
     "react": "^17.0.2",
-    "react-bootstrap": "^1.5.2",
     "react-dom": "^17.0.2",
     "react-scripts": "4.0.3",
-    "tesseract.js": "^2.0.0-beta.2"
   },
   "devDependencies": {
     "concurrently": "^6.0.0",
