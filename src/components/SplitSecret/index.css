@@ -1,0 +1,9 @@
+.split-secret {
+  height: 100%;
+  overflow-y: auto;
+}
+
+.generate-shares-header, .split-secret-header {
+  display: flex;
+  justify-content: space-between;
+}
